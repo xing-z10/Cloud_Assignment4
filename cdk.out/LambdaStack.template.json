@@ -673,6 +673,11 @@
        "Resource": {
         "Fn::ImportValue": "StorageStack:ExportsOutputFnGetAttSizeTable99A2E310Arn9F795F82"
        }
+      },
+      {
+       "Action": "cloudwatch:GetMetricStatistics",
+       "Effect": "Allow",
+       "Resource": "*"
       }
      ],
      "Version": "2012-10-17"
