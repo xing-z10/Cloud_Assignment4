@@ -1,0 +1,74 @@
+{
+  "/MonitoringStack/LogGroupName": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "LogGroupName"
+    }
+  ],
+  "/MonitoringStack/AlarmName": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AlarmName"
+    }
+  ],
+  "/MonitoringStack/AlarmTopicArn": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AlarmTopicArn"
+    }
+  ],
+  "/MonitoringStack/BootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BootstrapVersion"
+    }
+  ],
+  "/MonitoringStack/CheckBootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CheckBootstrapVersion"
+    }
+  ],
+  "/MonitoringStack/LoggingFunctionLogGroup/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "LoggingFunctionLogGroup583CF5F5"
+    }
+  ],
+  "/MonitoringStack/SizeDeltaMetricFilter/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "SizeDeltaMetricFilter6C059685"
+    }
+  ],
+  "/MonitoringStack/TotalSizeAlarm/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "TotalSizeAlarm740865ED"
+    }
+  ],
+  "/MonitoringStack/AlarmTopic/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AlarmTopicD01E77F9"
+    }
+  ],
+  "/MonitoringStack/CDKMetadata/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CDKMetadata"
+    }
+  ],
+  "/MonitoringStack/CDKMetadata/Condition": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CDKMetadataAvailable"
+    }
+  ],
+  "/MonitoringStack/Exports/Output{\"Ref\":\"AlarmTopicD01E77F9\"}": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ExportsOutputRefAlarmTopicD01E77F99DF7FB73"
+    }
+  ]
+}

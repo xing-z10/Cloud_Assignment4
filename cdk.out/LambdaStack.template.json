@@ -1,0 +1,1495 @@
+{
+ "Resources": {
+  "MatplotlibLayer07AD7126": {
+   "Type": "AWS::Lambda::LayerVersion",
+   "Properties": {
+    "CompatibleArchitectures": [
+     "arm64"
+    ],
+    "CompatibleRuntimes": [
+     "python3.12"
+    ],
+    "Content": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+     },
+     "S3Key": "b02ddd0fe7c8505d03fa7e9efde18c89245765a6006aeb4173cbe33866b40107.zip"
+    },
+    "Description": "matplotlib for ARM64 Python 3.12"
+   },
+   "Metadata": {
+    "aws:cdk:path": "LambdaStack/MatplotlibLayer/Resource",
+    "aws:asset:path": "asset.b02ddd0fe7c8505d03fa7e9efde18c89245765a6006aeb4173cbe33866b40107",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Content"
+   }
+  },
+  "SizeTrackerFunctionServiceRole03AA3019": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "LambdaStack/SizeTrackerFunction/ServiceRole/Resource"
+   }
+  },
+  "SizeTrackerFunctionServiceRoleDefaultPolicyA119628A": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "sqs:ChangeMessageVisibility",
+        "sqs:DeleteMessage",
+        "sqs:GetQueueAttributes",
+        "sqs:GetQueueUrl",
+        "sqs:ReceiveMessage"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "MessagingStack:ExportsOutputFnGetAttSizeTrackerQueue00A5E104Arn7EC12AA9"
+       }
+      },
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:GetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:PutItem",
+        "dynamodb:Query",
+        "dynamodb:Scan",
+        "dynamodb:UpdateItem"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "StorageStack:ExportsOutputFnGetAttSizeTable99A2E310Arn9F795F82"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "SizeTrackerFunctionServiceRoleDefaultPolicyA119628A",
+    "Roles": [
+     {
+      "Ref": "SizeTrackerFunctionServiceRole03AA3019"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "LambdaStack/SizeTrackerFunction/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "SizeTrackerFunction7D29974B": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+     },
+     "S3Key": "5dceb18b63d9fae4f4e0baa9e868d200057132a2656c7ab50f73acf114ea5854.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "BUCKET_NAME": {
+       "Fn::ImportValue": "StorageStack:ExportsOutputRefTestBucket560B80BC3F12F1DE"
+      },
+      "TABLE_NAME": {
+       "Fn::ImportValue": "StorageStack:ExportsOutputRefSizeTable99A2E31089435CA5"
+      },
+      "LOGGING_FN_NAME": "Assignment4-LoggingFunction"
+     }
+    },
+    "Handler": "handler.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "SizeTrackerFunctionServiceRole03AA3019",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.12",
+    "Timeout": 30
+   },
+   "DependsOn": [
+    "SizeTrackerFunctionServiceRoleDefaultPolicyA119628A",
+    "SizeTrackerFunctionServiceRole03AA3019"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "LambdaStack/SizeTrackerFunction/Resource",
+    "aws:asset:path": "asset.5dceb18b63d9fae4f4e0baa9e868d200057132a2656c7ab50f73acf114ea5854",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "SizeTrackerFunctionSqsEventSourceMessagingStackSizeTrackerQueueA06D436229467463": {
+   "Type": "AWS::Lambda::EventSourceMapping",
+   "Properties": {
+    "BatchSize": 1,
+    "EventSourceArn": {
+     "Fn::ImportValue": "MessagingStack:ExportsOutputFnGetAttSizeTrackerQueue00A5E104Arn7EC12AA9"
+    },
+    "FunctionName": {
+     "Ref": "SizeTrackerFunction7D29974B"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "LambdaStack/SizeTrackerFunction/SqsEventSource:MessagingStackSizeTrackerQueueA06D4362/Resource"
+   }
+  },
+  "LoggingFunctionServiceRoleD5FDC44D": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "LambdaStack/LoggingFunction/ServiceRole/Resource"
+   }
+  },
+  "LoggingFunctionServiceRoleDefaultPolicyAACC4E10": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "sqs:ChangeMessageVisibility",
+        "sqs:DeleteMessage",
+        "sqs:GetQueueAttributes",
+        "sqs:GetQueueUrl",
+        "sqs:ReceiveMessage"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "MessagingStack:ExportsOutputFnGetAttLoggerQueueD10ACCBDArn849CFCBE"
+       }
+      },
+      {
+       "Action": "logs:FilterLogEvents",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          "arn:aws:logs:",
+          {
+           "Ref": "AWS::Region"
+          },
+          ":",
+          {
+           "Ref": "AWS::AccountId"
+          },
+          ":log-group:/aws/lambda/Assignment4-LoggingFunction:*"
+         ]
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "LoggingFunctionServiceRoleDefaultPolicyAACC4E10",
+    "Roles": [
+     {
+      "Ref": "LoggingFunctionServiceRoleD5FDC44D"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "LambdaStack/LoggingFunction/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "LoggingFunctionA358127A": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+     },
+     "S3Key": "eabe88ea665dd8f02b5d3942d11d06de2140e6b83269b1cbd96989f6edc42f33.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "BUCKET_NAME": {
+       "Fn::ImportValue": "StorageStack:ExportsOutputRefTestBucket560B80BC3F12F1DE"
+      },
+      "TABLE_NAME": {
+       "Fn::ImportValue": "StorageStack:ExportsOutputRefSizeTable99A2E31089435CA5"
+      },
+      "LOGGING_FN_NAME": "Assignment4-LoggingFunction"
+     }
+    },
+    "FunctionName": "Assignment4-LoggingFunction",
+    "Handler": "handler.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "LoggingFunctionServiceRoleD5FDC44D",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.12",
+    "Timeout": 30
+   },
+   "DependsOn": [
+    "LoggingFunctionServiceRoleDefaultPolicyAACC4E10",
+    "LoggingFunctionServiceRoleD5FDC44D"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "LambdaStack/LoggingFunction/Resource",
+    "aws:asset:path": "asset.eabe88ea665dd8f02b5d3942d11d06de2140e6b83269b1cbd96989f6edc42f33",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "LoggingFunctionSqsEventSourceMessagingStackLoggerQueueE83B91882DEFD77D": {
+   "Type": "AWS::Lambda::EventSourceMapping",
+   "Properties": {
+    "BatchSize": 1,
+    "EventSourceArn": {
+     "Fn::ImportValue": "MessagingStack:ExportsOutputFnGetAttLoggerQueueD10ACCBDArn849CFCBE"
+    },
+    "FunctionName": {
+     "Ref": "LoggingFunctionA358127A"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "LambdaStack/LoggingFunction/SqsEventSource:MessagingStackLoggerQueueE83B9188/Resource"
+   }
+  },
+  "CleanerFunctionServiceRole0677512D": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "LambdaStack/CleanerFunction/ServiceRole/Resource"
+   }
+  },
+  "CleanerFunctionServiceRoleDefaultPolicy8210BC79": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "s3:GetBucket*",
+        "s3:GetObject*",
+        "s3:List*"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::ImportValue": "StorageStack:ExportsOutputFnGetAttTestBucket560B80BCArnA29F078C"
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::ImportValue": "StorageStack:ExportsOutputFnGetAttTestBucket560B80BCArnA29F078C"
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": "s3:DeleteObject*",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::ImportValue": "StorageStack:ExportsOutputFnGetAttTestBucket560B80BCArnA29F078C"
+          },
+          "/*"
+         ]
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "CleanerFunctionServiceRoleDefaultPolicy8210BC79",
+    "Roles": [
+     {
+      "Ref": "CleanerFunctionServiceRole0677512D"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "LambdaStack/CleanerFunction/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "CleanerFunction67FA5C5F": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+     },
+     "S3Key": "0b728567367882daca49d25e93b515c895d55343d4c8f0dde7c7574aba5242ba.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "BUCKET_NAME": {
+       "Fn::ImportValue": "StorageStack:ExportsOutputRefTestBucket560B80BC3F12F1DE"
+      },
+      "TABLE_NAME": {
+       "Fn::ImportValue": "StorageStack:ExportsOutputRefSizeTable99A2E31089435CA5"
+      },
+      "LOGGING_FN_NAME": "Assignment4-LoggingFunction"
+     }
+    },
+    "Handler": "handler.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "CleanerFunctionServiceRole0677512D",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.12",
+    "Timeout": 30
+   },
+   "DependsOn": [
+    "CleanerFunctionServiceRoleDefaultPolicy8210BC79",
+    "CleanerFunctionServiceRole0677512D"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "LambdaStack/CleanerFunction/Resource",
+    "aws:asset:path": "asset.0b728567367882daca49d25e93b515c895d55343d4c8f0dde7c7574aba5242ba",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "CleanerFunctionAllowInvokeMonitoringStackAlarmTopic1177E02792FA6834": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "CleanerFunction67FA5C5F",
+      "Arn"
+     ]
+    },
+    "Principal": "sns.amazonaws.com",
+    "SourceArn": {
+     "Fn::ImportValue": "MonitoringStack:ExportsOutputRefAlarmTopicD01E77F99DF7FB73"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "LambdaStack/CleanerFunction/AllowInvoke:MonitoringStackAlarmTopic1177E027"
+   }
+  },
+  "CleanerFunctionAlarmTopicF7E79315": {
+   "Type": "AWS::SNS::Subscription",
+   "Properties": {
+    "Endpoint": {
+     "Fn::GetAtt": [
+      "CleanerFunction67FA5C5F",
+      "Arn"
+     ]
+    },
+    "Protocol": "lambda",
+    "TopicArn": {
+     "Fn::ImportValue": "MonitoringStack:ExportsOutputRefAlarmTopicD01E77F99DF7FB73"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "LambdaStack/CleanerFunction/AlarmTopic/Resource"
+   }
+  },
+  "DriverFunctionServiceRole19170285": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "LambdaStack/DriverFunction/ServiceRole/Resource"
+   }
+  },
+  "DriverFunctionServiceRoleDefaultPolicy51C555A2": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "s3:Abort*",
+        "s3:PutObject",
+        "s3:PutObjectLegalHold",
+        "s3:PutObjectRetention",
+        "s3:PutObjectTagging",
+        "s3:PutObjectVersionTagging"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::ImportValue": "StorageStack:ExportsOutputFnGetAttTestBucket560B80BCArnA29F078C"
+          },
+          "/*"
+         ]
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "DriverFunctionServiceRoleDefaultPolicy51C555A2",
+    "Roles": [
+     {
+      "Ref": "DriverFunctionServiceRole19170285"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "LambdaStack/DriverFunction/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "DriverFunction5A795A9A": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+     },
+     "S3Key": "70fe4b830997e404a5af4699f9519b434defabc94ac3c16a09c8903aea368f9d.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "BUCKET_NAME": {
+       "Fn::ImportValue": "StorageStack:ExportsOutputRefTestBucket560B80BC3F12F1DE"
+      },
+      "TABLE_NAME": {
+       "Fn::ImportValue": "StorageStack:ExportsOutputRefSizeTable99A2E31089435CA5"
+      },
+      "LOGGING_FN_NAME": "Assignment4-LoggingFunction",
+      "PLOTTER_API_URL": {
+       "Fn::Join": [
+        "",
+        [
+         "https://",
+         {
+          "Ref": "PlotterApi3656C897"
+         },
+         ".execute-api.",
+         {
+          "Ref": "AWS::Region"
+         },
+         ".",
+         {
+          "Ref": "AWS::URLSuffix"
+         },
+         "/",
+         {
+          "Ref": "PlotterApiDeploymentStageprod7DB12B62"
+         },
+         "/"
+        ]
+       ]
+      }
+     }
+    },
+    "Handler": "handler.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "DriverFunctionServiceRole19170285",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.12",
+    "Timeout": 300
+   },
+   "DependsOn": [
+    "DriverFunctionServiceRoleDefaultPolicy51C555A2",
+    "DriverFunctionServiceRole19170285"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "LambdaStack/DriverFunction/Resource",
+    "aws:asset:path": "asset.70fe4b830997e404a5af4699f9519b434defabc94ac3c16a09c8903aea368f9d",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "PlotterFunctionServiceRole195329F0": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "LambdaStack/PlotterFunction/ServiceRole/Resource"
+   }
+  },
+  "PlotterFunctionServiceRoleDefaultPolicy0533AB5F": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:GetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:Query",
+        "dynamodb:Scan"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "StorageStack:ExportsOutputFnGetAttSizeTable99A2E310Arn9F795F82"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "PlotterFunctionServiceRoleDefaultPolicy0533AB5F",
+    "Roles": [
+     {
+      "Ref": "PlotterFunctionServiceRole195329F0"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "LambdaStack/PlotterFunction/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "PlotterFunction6CD15357": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Architectures": [
+     "arm64"
+    ],
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+     },
+     "S3Key": "d49ddfd3e642b37f561a9f571e817cb078295d9ebc0dc53ecad81a0f04513ffb.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "BUCKET_NAME": {
+       "Fn::ImportValue": "StorageStack:ExportsOutputRefTestBucket560B80BC3F12F1DE"
+      },
+      "TABLE_NAME": {
+       "Fn::ImportValue": "StorageStack:ExportsOutputRefSizeTable99A2E31089435CA5"
+      },
+      "LOGGING_FN_NAME": "Assignment4-LoggingFunction"
+     }
+    },
+    "Handler": "handler.handler",
+    "Layers": [
+     {
+      "Ref": "MatplotlibLayer07AD7126"
+     }
+    ],
+    "Role": {
+     "Fn::GetAtt": [
+      "PlotterFunctionServiceRole195329F0",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.12",
+    "Timeout": 30
+   },
+   "DependsOn": [
+    "PlotterFunctionServiceRoleDefaultPolicy0533AB5F",
+    "PlotterFunctionServiceRole195329F0"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "LambdaStack/PlotterFunction/Resource",
+    "aws:asset:path": "asset.d49ddfd3e642b37f561a9f571e817cb078295d9ebc0dc53ecad81a0f04513ffb",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "PlotterApi3656C897": {
+   "Type": "AWS::ApiGateway::RestApi",
+   "Properties": {
+    "Name": "PlotterApi"
+   },
+   "Metadata": {
+    "aws:cdk:path": "LambdaStack/PlotterApi/Resource"
+   }
+  },
+  "PlotterApiCloudWatchRoleC0803ACA": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "apigateway.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+       ]
+      ]
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "LambdaStack/PlotterApi/CloudWatchRole/Resource"
+   }
+  },
+  "PlotterApiAccountB7A59033": {
+   "Type": "AWS::ApiGateway::Account",
+   "Properties": {
+    "CloudWatchRoleArn": {
+     "Fn::GetAtt": [
+      "PlotterApiCloudWatchRoleC0803ACA",
+      "Arn"
+     ]
+    }
+   },
+   "DependsOn": [
+    "PlotterApi3656C897"
+   ],
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "LambdaStack/PlotterApi/Account"
+   }
+  },
+  "PlotterApiDeployment1FEB8B6A16a0a7d8574124a701e7214cab602ffd": {
+   "Type": "AWS::ApiGateway::Deployment",
+   "Properties": {
+    "Description": "Automatically created by the RestApi construct",
+    "RestApiId": {
+     "Ref": "PlotterApi3656C897"
+    }
+   },
+   "DependsOn": [
+    "PlotterApiproxyANY81EDBEFF",
+    "PlotterApiproxy24816483",
+    "PlotterApiANYB5A036A7"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "LambdaStack/PlotterApi/Deployment/Resource",
+    "aws:cdk:do-not-refactor": true
+   }
+  },
+  "PlotterApiDeploymentStageprod7DB12B62": {
+   "Type": "AWS::ApiGateway::Stage",
+   "Properties": {
+    "DeploymentId": {
+     "Ref": "PlotterApiDeployment1FEB8B6A16a0a7d8574124a701e7214cab602ffd"
+    },
+    "RestApiId": {
+     "Ref": "PlotterApi3656C897"
+    },
+    "StageName": "prod"
+   },
+   "DependsOn": [
+    "PlotterApiAccountB7A59033"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "LambdaStack/PlotterApi/DeploymentStage.prod/Resource"
+   }
+  },
+  "PlotterApiproxy24816483": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "PlotterApi3656C897",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "{proxy+}",
+    "RestApiId": {
+     "Ref": "PlotterApi3656C897"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "LambdaStack/PlotterApi/Default/{proxy+}/Resource"
+   }
+  },
+  "PlotterApiproxyANYApiPermissionLambdaStackPlotterApi59D0C98CANYproxyD784D3FD": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "PlotterFunction6CD15357",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "PlotterApi3656C897"
+       },
+       "/",
+       {
+        "Ref": "PlotterApiDeploymentStageprod7DB12B62"
+       },
+       "/*/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "LambdaStack/PlotterApi/Default/{proxy+}/ANY/ApiPermission.LambdaStackPlotterApi59D0C98C.ANY..{proxy+}"
+   }
+  },
+  "PlotterApiproxyANYApiPermissionTestLambdaStackPlotterApi59D0C98CANYproxyACE4E0EC": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "PlotterFunction6CD15357",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "PlotterApi3656C897"
+       },
+       "/test-invoke-stage/*/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "LambdaStack/PlotterApi/Default/{proxy+}/ANY/ApiPermission.Test.LambdaStackPlotterApi59D0C98C.ANY..{proxy+}"
+   }
+  },
+  "PlotterApiproxyANY81EDBEFF": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "ANY",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":apigateway:",
+        {
+         "Ref": "AWS::Region"
+        },
+        ":lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "PlotterFunction6CD15357",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "PlotterApiproxy24816483"
+    },
+    "RestApiId": {
+     "Ref": "PlotterApi3656C897"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "LambdaStack/PlotterApi/Default/{proxy+}/ANY/Resource"
+   }
+  },
+  "PlotterApiANYApiPermissionLambdaStackPlotterApi59D0C98CANYFBE291B0": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "PlotterFunction6CD15357",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "PlotterApi3656C897"
+       },
+       "/",
+       {
+        "Ref": "PlotterApiDeploymentStageprod7DB12B62"
+       },
+       "/*/"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "LambdaStack/PlotterApi/Default/ANY/ApiPermission.LambdaStackPlotterApi59D0C98C.ANY.."
+   }
+  },
+  "PlotterApiANYApiPermissionTestLambdaStackPlotterApi59D0C98CANY9C0AB7B4": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "PlotterFunction6CD15357",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "PlotterApi3656C897"
+       },
+       "/test-invoke-stage/*/"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "LambdaStack/PlotterApi/Default/ANY/ApiPermission.Test.LambdaStackPlotterApi59D0C98C.ANY.."
+   }
+  },
+  "PlotterApiANYB5A036A7": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "ANY",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":apigateway:",
+        {
+         "Ref": "AWS::Region"
+        },
+        ":lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "PlotterFunction6CD15357",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Fn::GetAtt": [
+      "PlotterApi3656C897",
+      "RootResourceId"
+     ]
+    },
+    "RestApiId": {
+     "Ref": "PlotterApi3656C897"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "LambdaStack/PlotterApi/Default/ANY/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/21Qy07DMBD8lt5dUxouHFMeJyqiVOJabZwlNUlsy2tToij/ju2kUCROOzNrj2Z2y7d3Gd+s4ExrUbfrTlZ8PDgQLQvSceygr2rg4wsMaN/QktSKPbyrP/zZK+GWxQ9++kTlDtpbgXswRqomrv9XC7S9pOg1McqOQISOeB5H4HznRYtuB4RMQs/HUncYv6VZ6E6KIbkkFBwUhQ6+ImGlueS65hMDIxtweIYhVosVSySXG5lsf2EuhPbKsUc0nR76kD2qVyycqklZZhC+pm4pa2H113BRFuMZ79GddB2lGU0TS2WjyXKSV++MdxMrhvBA3WT8dsPvVx8k5dqGRLJHXs7zG8Mf9cTDAQAA"
+   },
+   "Metadata": {
+    "aws:cdk:path": "LambdaStack/CDKMetadata/Default"
+   },
+   "Condition": "CDKMetadataAvailable"
+  }
+ },
+ "Outputs": {
+  "PlotterApiEndpoint6BC8BF1F": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "PlotterApi3656C897"
+      },
+      ".execute-api.",
+      {
+       "Ref": "AWS::Region"
+      },
+      ".",
+      {
+       "Ref": "AWS::URLSuffix"
+      },
+      "/",
+      {
+       "Ref": "PlotterApiDeploymentStageprod7DB12B62"
+      },
+      "/"
+     ]
+    ]
+   }
+  },
+  "PlotterApiUrl": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "PlotterApi3656C897"
+      },
+      ".execute-api.",
+      {
+       "Ref": "AWS::Region"
+      },
+      ".",
+      {
+       "Ref": "AWS::URLSuffix"
+      },
+      "/",
+      {
+       "Ref": "PlotterApiDeploymentStageprod7DB12B62"
+      },
+      "/"
+     ]
+    ]
+   }
+  },
+  "DriverFunctionName": {
+   "Value": {
+    "Ref": "DriverFunction5A795A9A"
+   }
+  },
+  "CleanerFunctionName": {
+   "Value": {
+    "Ref": "CleanerFunction67FA5C5F"
+   }
+  },
+  "LoggingFunctionName": {
+   "Value": {
+    "Ref": "LoggingFunctionA358127A"
+   }
+  }
+ },
+ "Conditions": {
+  "CDKMetadataAvailable": {
+   "Fn::Or": [
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "af-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-3"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-south-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-3"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-4"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ca-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ca-west-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "cn-north-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "cn-northwest-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-central-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-north-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-south-2"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-3"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "il-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "me-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "me-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "sa-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-east-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-west-1"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Equals": [
+      {
+       "Ref": "AWS::Region"
+      },
+      "us-west-2"
+     ]
+    }
+   ]
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

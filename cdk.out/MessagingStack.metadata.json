@@ -1,0 +1,86 @@
+{
+  "/MessagingStack/SizeTrackerQueueUrl": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "SizeTrackerQueueUrl"
+    }
+  ],
+  "/MessagingStack/LoggerQueueUrl": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "LoggerQueueUrl"
+    }
+  ],
+  "/MessagingStack/BootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BootstrapVersion"
+    }
+  ],
+  "/MessagingStack/CheckBootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CheckBootstrapVersion"
+    }
+  ],
+  "/MessagingStack/SizeTrackerQueue/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "SizeTrackerQueue00A5E104"
+    }
+  ],
+  "/MessagingStack/LoggerQueue/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "LoggerQueueD10ACCBD"
+    }
+  ],
+  "/MessagingStack/CDKMetadata/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CDKMetadata"
+    }
+  ],
+  "/MessagingStack/CDKMetadata/Condition": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CDKMetadataAvailable"
+    }
+  ],
+  "/MessagingStack/Exports/Output{\"Fn::GetAtt\":[\"SizeTrackerQueue00A5E104\",\"Arn\"]}": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ExportsOutputFnGetAttSizeTrackerQueue00A5E104Arn7EC12AA9"
+    }
+  ],
+  "/MessagingStack/Exports/Output{\"Fn::GetAtt\":[\"LoggerQueueD10ACCBD\",\"Arn\"]}": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ExportsOutputFnGetAttLoggerQueueD10ACCBDArn849CFCBE"
+    }
+  ],
+  "/MessagingStack/SizeTrackerQueue/Policy/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "SizeTrackerQueuePolicyAF3A666B"
+    }
+  ],
+  "/MessagingStack/SizeTrackerQueue/StorageStackS3EventsTopic6F37E132/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "SizeTrackerQueueStorageStackS3EventsTopic6F37E1323C6385EA"
+    }
+  ],
+  "/MessagingStack/LoggerQueue/Policy/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "LoggerQueuePolicyC8A60919"
+    }
+  ],
+  "/MessagingStack/LoggerQueue/StorageStackS3EventsTopic6F37E132/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "LoggerQueueStorageStackS3EventsTopic6F37E1323D30DB7F"
+    }
+  ]
+}
