@@ -167,6 +167,7 @@ class LambdaStack(Stack):
             layers=[matplotlib_layer],
         )
         table.grant_read_data(self.plotter_fn)
+        bucket.grant_put(self.plotter_fn)
         self.plotter_fn.add_to_role_policy(iam.PolicyStatement(
             actions=["cloudwatch:GetMetricStatistics"],
             resources=["*"],

@@ -561,7 +561,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "70fe4b830997e404a5af4699f9519b434defabc94ac3c16a09c8903aea368f9d.zip"
+     "S3Key": "e95dcf4842cb86f23e77fc28d7fcb1eb98c1a64395475de5f64eb281639b1e24.zip"
     },
     "Environment": {
      "Variables": {
@@ -614,7 +614,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "LambdaStack/DriverFunction/Resource",
-    "aws:asset:path": "asset.70fe4b830997e404a5af4699f9519b434defabc94ac3c16a09c8903aea368f9d",
+    "aws:asset:path": "asset.e95dcf4842cb86f23e77fc28d7fcb1eb98c1a64395475de5f64eb281639b1e24",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }
@@ -675,6 +675,28 @@
        }
       },
       {
+       "Action": [
+        "s3:Abort*",
+        "s3:PutObject",
+        "s3:PutObjectLegalHold",
+        "s3:PutObjectRetention",
+        "s3:PutObjectTagging",
+        "s3:PutObjectVersionTagging"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::ImportValue": "StorageStack:ExportsOutputFnGetAttTestBucket560B80BCArnA29F078C"
+          },
+          "/*"
+         ]
+        ]
+       }
+      },
+      {
        "Action": "cloudwatch:GetMetricStatistics",
        "Effect": "Allow",
        "Resource": "*"
@@ -703,7 +725,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "d49ddfd3e642b37f561a9f571e817cb078295d9ebc0dc53ecad81a0f04513ffb.zip"
+     "S3Key": "30f01555fe89c5be744b15a8f7a174d173e894419b01cd688ca3696eceb3c9a6.zip"
     },
     "Environment": {
      "Variables": {
@@ -737,7 +759,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "LambdaStack/PlotterFunction/Resource",
-    "aws:asset:path": "asset.d49ddfd3e642b37f561a9f571e817cb078295d9ebc0dc53ecad81a0f04513ffb",
+    "aws:asset:path": "asset.30f01555fe89c5be744b15a8f7a174d173e894419b01cd688ca3696eceb3c9a6",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }
