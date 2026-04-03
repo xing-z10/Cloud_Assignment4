@@ -56,7 +56,7 @@ class MonitoringStack(Stack):
 
         # 从 metric filter 拿到 metric 对象，供 alarm 使用
         total_size_metric = metric_filter.metric(
-            period=Duration.minutes(5),
+            period=Duration.seconds(10),
             statistic="Sum",
         )
 

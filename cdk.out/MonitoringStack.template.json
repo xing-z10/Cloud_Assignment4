@@ -46,7 +46,7 @@
     "EvaluationPeriods": 1,
     "MetricName": "TotalObjectSize",
     "Namespace": "Assignment4App",
-    "Period": 300,
+    "Period": 10,
     "Statistic": "Sum",
     "Threshold": 20,
     "TreatMissingData": "notBreaching"

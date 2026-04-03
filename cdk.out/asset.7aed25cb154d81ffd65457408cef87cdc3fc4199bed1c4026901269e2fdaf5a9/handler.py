@@ -1,7 +1,6 @@
 import json
 import os
 import boto3
-from decimal import Decimal
 from datetime import datetime, timezone
 
 BUCKET_NAME = os.environ["BUCKET_NAME"]
@@ -21,7 +20,7 @@ def get_current_total() -> float:
         Limit=1,
     )
     items = resp.get("Items", [])
-    return Decimal(str(items[0]["size_bytes"])) if items else Decimal("0")
+    return float(items[0]["size_bytes"]) if items else 0.0
 
 
 def handler(event, context):
@@ -51,7 +50,7 @@ def handler(event, context):
 
     # 写入新记录，total_size 减去被删除对象的大小
     current_total = get_current_total()
-    new_total = current_total - Decimal(str(size))
+    new_total     = current_total - size
     timestamp     = datetime.now(timezone.utc).isoformat()
 
     table.put_item(Item={

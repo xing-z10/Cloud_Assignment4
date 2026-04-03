@@ -145,7 +145,7 @@ def generate_plot(target_bucket):
 
     ax.set_xlabel('Timestamp (UTC)', fontsize=12)
     ax.set_ylabel('Size (bytes)', fontsize=12)
-    ax.set_title(f'Bucket Size History - {target_bucket}\n(Last 5 minutes)', fontsize=14)
+    ax.set_title(f'Bucket Size History - {target_bucket}\n(Last 10 seconds)', fontsize=14)
     ax.legend(loc='best', fontsize=10)
     ax.grid(True, alpha=0.3)
     plt.xticks(rotation=45)

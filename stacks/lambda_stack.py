@@ -148,7 +148,7 @@ class LambdaStack(Stack):
             handler="handler.handler",
             code=lambda_code("driver"),
             environment=common_env,
-            timeout=Duration.seconds(300),   # driver 需要 sleep，timeout 设长一些
+            timeout=Duration.seconds(120),   # 2分钟，覆盖两次 sleep(30)
         )
         bucket.grant_put(self.driver_fn)
 

@@ -3,8 +3,8 @@ import time
 import urllib.request
 import boto3
 
-BUCKET_NAME = os.environ["BUCKET_NAME"]
-PLOTTER_API = os.environ.get("PLOTTER_API_URL", "")
+BUCKET_NAME    = os.environ["BUCKET_NAME"]
+PLOTTER_API    = os.environ.get("PLOTTER_API_URL", "")   # CDK output 注入
 
 s3 = boto3.client("s3")
 
@@ -16,27 +16,26 @@ def put_object(key: str, body: str):
 
 def handler(event, context):
     # ── Step 1: upload assignment1.txt (18 bytes) ──────────────────────
-    # total = 18, alarm 不触发
     put_object("assignment1.txt", "Empty Assignment 1")
+    # total = 18, alarm not yet fired
 
-    time.sleep(10)  # 等 SNS/SQS/Lambda 处理完
+    time.sleep(10)   # 等 SNS/SQS/Lambda 处理完
 
     # ── Step 2: upload assignment2.txt (28 bytes) ──────────────────────
-    # total = 18 + 28 = 46 > 20 → alarm 触发 → Cleaner 删除 assignment2.txt
     put_object("assignment2.txt", "Empty Assignment 2222222222")
+    # total = 18 + 28 = 46 > 20 → alarm 应触发 → Cleaner 删除 assignment2.txt
 
-    time.sleep(30)  # 等待 alarm 评估周期(10秒) + Cleaner 执行
-    # 预期: assignment2.txt 被删除, total = 18
+    time.sleep(10)   # 等 alarm 评估周期 + Cleaner 执行完
+    # 预期: assignment2.txt 被删除, total ≈ 18
 
     # ── Step 3: upload assignment3.txt (2 bytes) ───────────────────────
-    # total = 18 + 2 = 20, 不超过阈值不触发
-    # 但 logging lambda 记录的 size_delta 累加后 > 20 → alarm 再次触发
-    # → Cleaner 删除 assignment1.txt
     put_object("assignment3.txt", "33")
+    # total = 18 + 2 = 20, 不超过阈值（> 20 才触发），alarm 不应再触发
+    # 但如果 alarm 周期内累积超过 20，Cleaner 会删除 assignment1.txt
 
-    time.sleep(30)  # 等待第二次 alarm 触发 + Cleaner 执行
+    time.sleep(10)   # 等待 alarm 评估完成
 
-    # ── Step 4: 调用 Plotter API ───────────────────────────────────────
+    # ── Step 4: 调用 Plotter API ────────────────────────────────────────
     if PLOTTER_API:
         print(f"Calling plotter API: {PLOTTER_API}")
         try:

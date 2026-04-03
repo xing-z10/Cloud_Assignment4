@@ -66,7 +66,7 @@ def generate_plot(target_bucket):
     table = dynamodb.Table(TABLE_NAME)
 
     end_time   = datetime.utcnow()
-    start_time = end_time - timedelta(seconds=120)  # 最近 2 分钟
+    start_time = end_time - timedelta(seconds=150)
 
     # ── 1. 查询时间窗口内的数据 ──────────────────────────────────────────────
     response = table.query(
@@ -80,7 +80,7 @@ def generate_plot(target_bucket):
         ScanIndexForward=True,
     )
     items = response.get('Items', [])
-    print(f"Found {len(items)} items in last 10 seconds")
+    print(f"Found {len(items)} items in last 10 minutes")
 
     # ── 2. 获取时间窗口之前的最后一条记录（用于填充起始点） ─────────────────
     pre_response = table.query(
@@ -145,7 +145,7 @@ def generate_plot(target_bucket):
 
     ax.set_xlabel('Timestamp (UTC)', fontsize=12)
     ax.set_ylabel('Size (bytes)', fontsize=12)
-    ax.set_title(f'Bucket Size History - {target_bucket}\n(Last 5 minutes)', fontsize=14)
+    ax.set_title(f'Bucket Size History - {target_bucket}\n(Last 10 minutes)', fontsize=14)
     ax.legend(loc='best', fontsize=10)
     ax.grid(True, alpha=0.3)
     plt.xticks(rotation=45)
